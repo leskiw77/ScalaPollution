@@ -1,6 +1,5 @@
 package controllers
 
-import play.api.http.Writeable
 import play.api.mvc._
 import service.GetAllService
 /**

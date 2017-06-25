@@ -1,7 +1,6 @@
-@(message: String)
+@import model.Station
+@(message: String, stations: Seq[Station])
 
-@main("Welcome to Play") {
-
+@main("Pollution Monitor", stations) {
     @play20.welcome(message)
-
 }
