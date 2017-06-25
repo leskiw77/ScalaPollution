@@ -1,7 +1,7 @@
 package service
 
 import model.{Measurement, StationMeasurement}
-import play.api.libs.json.{JsResultException, Json}
+import play.api.libs.json._
 
 object GetBasicStationInformation {
 
@@ -10,8 +10,30 @@ object GetBasicStationInformation {
     val measumentList = for {
       sensorId <- getSensorsIdListForStation(stationId)
     }yield getLastMeasurementForSensor(sensorId)
-    StationMeasurement(stationId,indexLevelName,measumentList)
+    getJsonFromStationMeasurement(StationMeasurement(stationId,indexLevelName,measumentList))
   }
+
+  private def getJsonSeqFromMeasurement(measurements: Seq[Measurement]) = {
+    Json.toJson(for{
+      measurement <- measurements
+    }yield{
+      JsObject(Seq(
+        "key" -> JsString(measurement.key),
+        "lastValue" -> JsNumber(measurement.lastValue),
+        "dateOfLastMeasurement" -> JsString(measurement.dateOfLastMeasurement)
+      ))
+    })
+  }
+
+  private def getJsonFromStationMeasurement(station : StationMeasurement) = {
+    val json: JsValue = JsObject(Seq(
+      "id" -> JsNumber(station.id),
+      "indexLevelName" -> JsString(station.indexLevelName),
+      "measurements" -> getJsonSeqFromMeasurement(station.measurements)
+    ))
+    json
+  }
+
 
   private def get(url: String) = scala.io.Source.fromURL(url).mkString
 
@@ -60,5 +82,9 @@ object GetBasicStationInformation {
     }
 
     throw new IllegalStateException("No measurements for sensor")
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(Json.toJson(getMeasurementsForStation(14).toString))
   }
 }
