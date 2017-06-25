@@ -1,11 +1,9 @@
 package controllers
 
-import play.api.http.Writeable
 import play.api.mvc._
 import service.GetAllService
-/**
-  * Created by jarema on 6/25/17.
-  */
+
+
 object GetAllController extends Controller  {
 
   def getAll = Action{
@@ -16,7 +14,4 @@ object GetAllController extends Controller  {
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)
     }
   }
-
-
-
 }
