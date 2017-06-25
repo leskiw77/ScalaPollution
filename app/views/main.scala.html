@@ -22,16 +22,25 @@
     </head>
 
     <body>
+        <div id="mainDiv" style="margin:0px auto; width:100%">
+            <div id="columnMap" style="float:left; margin:0; width:70%;">
+                <div class="map"></div>
+            </div>
+            <div id="columnStationTable" style="float:left; margin:0;width:30%;">
+                <div class="col"><table id="singleStationInfoTable"></table></div>
+            </div>
+        </div>
         <div id="map"></div>
+
         <table id="tempStationsTable">
-            @for(station <- stations){
-                <tr>
-                    <th>@station.id</th>
-                    <th>@station.stationName</th>
-                    <th>@station.geogrLat</th>
-                    <th>@station.geogrLng</th>
-                </tr>
-            }
+        @for(station <- stations) {
+            <tr>
+                <th>@station.id</th>
+                <th>@station.stationName</th>
+                <th>@station.geogrLat</th>
+                <th>@station.geogrLng</th>
+            </tr>
+        }
         </table>
         <script>
                 var map;
@@ -55,25 +64,54 @@
                     var table = document.getElementById('tempStationsTable');
                     var rows = table.rows;
                     for (var r = 0, n = rows.length; r < n; r++) {
+                        var id = parseInt(rows[r].cells[0].innerHTML);
                         var name = String(rows[r].cells[1].innerHTML);
                         var lan = parseFloat(String(rows[r].cells[2].innerHTML));
                         var lng = parseFloat(String(rows[r].cells[3].innerHTML));
-                        addCity(name,lan,lng);
+                        addCity(id, name, lan, lng);
                     }
                     table.parentNode.removeChild(table);
                 }
 
-                function addCity(name, latitude, longitude) {
+                function addCity(id, name, latitude, longitude) {
                     var marker = new google.maps.Marker({
                         position: {lat: latitude, lng: longitude},
                         label: ' ',
                         map: map
                     });
                     marker.addListener('click', function () {
-                        alert(name)
+                        setStationInfoTable(id, name, latitude, longitude)
                     });
                 }
 
+                function setStationInfoTable(id, name, lat, lng) {
+                    var table = document.getElementById('singleStationInfoTable');
+                    var url = '/getAll/'.concat(String(id));
+                    setStationInfoById(url, name, lat, lng, table);
+                }
+
+                function setStationInfoById(url, name, lat, lng, table) {
+                    table.innerHTML = "";
+                    var resultHttp = new XMLHttpRequest();
+                    resultHttp.open("GET", url, false);
+                    resultHttp.send(null);
+                    for(i = 0 ; i < 3 ; i++) {
+                        table.insertRow(i);
+                        for(j = 0 ; j < 2 ; j++) {
+                            table.rows[i].insertCell(j);
+                        }
+                    }
+                    table.rows[0].cells[0].innerHTML = "Name";
+                    table.rows[0].cells[1].innerHTML = name;
+
+                    table.rows[1].cells[0].innerHTML = "Lat ";
+                    table.rows[1].cells[1].innerHTML = lat;
+
+                    table.rows[2].cells[0].innerHTML = "Lng ";
+                    table.rows[2].cells[1].innerHTML = lng;
+                    var json = resultHttp.responseText;
+                    alert(json);
+                }
         </script>
 
     </body>
