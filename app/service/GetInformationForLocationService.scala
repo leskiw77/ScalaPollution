@@ -1,11 +1,9 @@
 package service
 
-import model.Station
+import model.{CityReport, Station}
 import play.api.libs.json.Json
 
 import scala.collection.immutable.List
-
-case class CityReport(name:String, indexLevelName:String, indexLevelValue:Int, stations: Seq[Station])
 
 
 object GetInformationForLocationService {
