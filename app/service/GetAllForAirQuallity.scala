@@ -25,11 +25,4 @@ object GetAllStationsForAirQualityService {
     }yield station
   }
 
-  def main(args: Array[String]): Unit = {
-    val st = Station(14,"Dupa",12,13)
-    println(getStationsForAirQuality(2))
-    println(getStationsForAirQuality(3))
-    println(getStationsForAirQuality(4))
-    println(getStationsForAirQuality(5))
-  }
 }

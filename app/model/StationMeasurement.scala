@@ -3,7 +3,7 @@ package model
 import play.api.libs.json._
 
 
-case class StationMeasurement(id:Int, indexLevelName:String, measurements: Seq[Measurement])
+case class StationMeasurement(id:Int, indexLevelName:String, indexLevelValue:Int, measurements: Seq[Measurement])
 case class Measurement(key:String, lastValue:Double, dateOfLastMeasurement:String)
 /*{
   implicit val stationWrites = new Writes[StationMeasurement] {

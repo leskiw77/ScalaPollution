@@ -6,11 +6,11 @@ import play.api.libs.json._
 object GetBasicStationInformation {
 
   def getMeasurementsForStation(stationId:Int) = {
-    val indexLevelName:String = getIndexLevelNameForStation(stationId)
+    val (indexLevelNum, indexLevelName) = getIndexLevelNameForStation(stationId)
     val measumentList = for {
       sensorId <- getSensorsIdListForStation(stationId)
     }yield getLastMeasurementForSensor(sensorId)
-    getJsonFromStationMeasurement(StationMeasurement(stationId,indexLevelName,measumentList))
+    getJsonFromStationMeasurement(StationMeasurement(stationId,indexLevelName, indexLevelNum, measumentList))
   }
 
   private def getJsonSeqFromMeasurement(measurements: Seq[Measurement]) = {
@@ -28,6 +28,7 @@ object GetBasicStationInformation {
   private def getJsonFromStationMeasurement(station : StationMeasurement) = {
     val json: JsValue = JsObject(Seq(
       "id" -> JsNumber(station.id),
+      "indexLevelNumber" -> JsNumber(station.indexLevelValue),
       "indexLevelName" -> JsString(station.indexLevelName),
       "measurements" -> getJsonSeqFromMeasurement(station.measurements)
     ))
@@ -50,7 +51,7 @@ object GetBasicStationInformation {
     val url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + stationId.toString
     val content = get(url)
     val json = Json.parse(content)
-    (json \ "stIndexLevel" \ "indexLevelName").as[String]
+    ((json \ "stIndexLevel" \ "id").as[Int], (json \ "stIndexLevel" \ "indexLevelName").as[String])
   }
 
   private def getLastMeasurementForSensor(sensorId: Int): Measurement = {
