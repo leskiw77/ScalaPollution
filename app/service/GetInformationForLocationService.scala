@@ -1,14 +1,26 @@
 package service
 
 import model.{CityReport, Station}
-import play.api.libs.json.Json
+import play.api.libs.json._
 
 import scala.collection.immutable.List
 
 
 object GetInformationForLocationService {
 
-  def getCityReport(cityToFind:String) = {
+  def getJsonCityReport(cityToFind:String) = {
+
+    val report = getCityReport(cityToFind)
+    val json: JsValue = JsObject(Seq(
+      "name" -> JsString(report.name),
+      "indexLevelValue" -> JsNumber(report.indexLevelValue),
+      "indexLevelNumber" -> JsString(report.indexLevelName),
+      "stations" -> Json.toJson(for {stationId <- report.stations} yield JsNumber(stationId.id))
+    ))
+    json
+  }
+
+  def getCityReport(cityToFind:String) : CityReport = {
     val stations = getStationsForCity(cityToFind)
     val index_values = stations.map(getIndexLevelNumberForStation)
     val index = (index_values.sum.toDouble / index_values.length).round
