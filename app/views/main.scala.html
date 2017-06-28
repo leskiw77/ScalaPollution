@@ -45,6 +45,18 @@
         <script>
                 var map;
                 function initMap() {
+                    var table = document.getElementById('singleStationInfoTable');
+                    for(var i = 0 ; i < 10 ; i++) {
+                        table.insertRow(i);
+                        for(var j = 0 ; j < 2 ; j++) {
+                            table.rows[i].insertCell(j);
+                        }
+                    }
+                    table.rows[0].cells[0].innerHTML = "Name";
+                    table.rows[1].cells[0].innerHTML = "Lat ";
+                    table.rows[2].cells[0].innerHTML = "Lng ";
+                    table.rows[3].cells[0].innerHTML = "Pollution level ";
+
                     map = new google.maps.Map(document.getElementById('map'), {
                         center: {lat: 50.068000, lng: 19.912410},
                         zoom: 8
@@ -86,31 +98,25 @@
 
                 function setStationInfoTable(id, name, lat, lng) {
                     var table = document.getElementById('singleStationInfoTable');
-                    var url = '/getAll/'.concat(String(id));
+                    var url = '/getInfo/'.concat(String(id));
                     setStationInfoById(url, name, lat, lng, table);
                 }
 
                 function setStationInfoById(url, name, lat, lng, table) {
-                    table.innerHTML = "";
                     var resultHttp = new XMLHttpRequest();
                     resultHttp.open("GET", url, false);
                     resultHttp.send(null);
-                    for(i = 0 ; i < 3 ; i++) {
-                        table.insertRow(i);
-                        for(j = 0 ; j < 2 ; j++) {
-                            table.rows[i].insertCell(j);
-                        }
-                    }
-                    table.rows[0].cells[0].innerHTML = "Name";
+
                     table.rows[0].cells[1].innerHTML = name;
-
-                    table.rows[1].cells[0].innerHTML = "Lat ";
                     table.rows[1].cells[1].innerHTML = lat;
-
-                    table.rows[2].cells[0].innerHTML = "Lng ";
                     table.rows[2].cells[1].innerHTML = lng;
-                    var json = resultHttp.responseText;
-                    alert(json);
+                    var json = JSON.parse(resultHttp.responseText);
+                    table.rows[3].cells[1].innerHTML = json['indexLevelName'];
+                    var measurements = json['measurements'];
+                    for(var i = 0 ; i < measurements.length ; i++) {
+                        table.rows[i+4].cells[0].innerHTML = measurements[i]['key'];
+                        table.rows[i+4].cells[1].innerHTML = measurements[i]['lastValue'];
+                    }
                 }
         </script>
 
