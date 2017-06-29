@@ -13,7 +13,7 @@ object GetAllStationsForAirQualityService {
   }
 
   def getStationsForAirQuality(airQuality: Int): Seq[Station] ={
-    val allStations:Seq[Station] =GetAllService.getAll()
+    val allStations:Seq[Station] = GetAllService.getAll()
     for{
       station <- allStations
       if getQualityForStation(station) == airQuality

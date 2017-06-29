@@ -3,7 +3,6 @@ package controllers
 import play.api.mvc._
 import service.GetAllService
 
-
 object GetAllController extends Controller  {
 
   def getAll = Action{

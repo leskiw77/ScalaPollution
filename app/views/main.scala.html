@@ -22,12 +22,20 @@
     </head>
 
     <body>
-        <div id="mainDiv" style="margin:0px auto; width:100%">
-            <div id="columnMap" style="float:left; margin:0; width:70%;">
-                <div class="map"></div>
+        <div id="columnStationTable" style="float:left; margin:0;width:30%;">
+            <div class="col1">
+                <table id="singleStationInfoTable"></table>
             </div>
-            <div id="columnStationTable" style="float:left; margin:0;width:30%;">
-                <div class="col"><table id="singleStationInfoTable"></table></div>
+            <div class="col2">
+                Find City : <br>
+                <input type="text" id="cityname" title="Find city">
+                <button onclick="filterByCityName()" type="button">Find By City</button><br>
+                    <button onclick="filterByCityName()" type="button">Very good</button><br>
+                    <button type="button">Good</button><br>
+                    <button type="button">Middle</button><br>
+                    <button type="button">Bad</button><br>
+                    <button type="button">Very Bad</button><br>
+                    <button onclick="resetMap()" type="button">RESET</button><br>
             </div>
         </div>
         <div id="map"></div>
@@ -44,9 +52,10 @@
         </table>
         <script>
                 var map;
+                var listOfPoints = [];
                 function initMap() {
                     var table = document.getElementById('singleStationInfoTable');
-                    for(var i = 0 ; i < 10 ; i++) {
+                    for(var i = 0 ; i < 12 ; i++) {
                         table.insertRow(i);
                         for(var j = 0 ; j < 2 ; j++) {
                             table.rows[i].insertCell(j);
@@ -72,6 +81,12 @@
                     setStationPoints();
                 }
 
+                function resetMap() {
+                    listOfPoints.forEach( function (e) {
+                        e['point'].setMap(map);
+                    })
+                }
+
                 function setStationPoints() {
                     var table = document.getElementById('tempStationsTable');
                     var rows = table.rows;
@@ -91,6 +106,7 @@
                         label: ' ',
                         map: map
                     });
+                    listOfPoints.push( {id:id , point:marker});
                     marker.addListener('click', function () {
                         setStationInfoTable(id, name, latitude, longitude)
                     });
@@ -116,6 +132,28 @@
                     for(var i = 0 ; i < measurements.length ; i++) {
                         table.rows[i+4].cells[0].innerHTML = measurements[i]['key'];
                         table.rows[i+4].cells[1].innerHTML = measurements[i]['lastValue'];
+                    }
+                }
+
+                function filterByCityName() {
+                    var cityname = document.getElementById('cityname').value
+                    if(cityname !== "") {
+                        var resultHttp = new XMLHttpRequest();
+                        resultHttp.open("GET", "/getReportForCity/".concat(cityname), false);
+                        resultHttp.send(null);
+                        var stations = JSON.parse(resultHttp.responseText)['stations'];
+                        for(var i = 0 ; i < listOfPoints.length ; i++) {
+                            listOfPoints[i]['point'].setMap(null);
+                        }
+                        for(i = 0 ; i < stations.length ; i++) {
+                            for(var j = 0 ; j < listOfPoints.length ; j++) {
+                                if(stations[i] === listOfPoints[j]['id']) {
+                                    listOfPoints[j]['point'].setMap(map);
+                                }
+                            }
+                        }
+                    } else {
+                        alert("Empty cityname!");
                     }
                 }
         </script>

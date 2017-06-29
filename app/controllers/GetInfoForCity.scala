@@ -4,9 +4,6 @@ import controllers.GetAllController.{InternalServerError, Ok}
 import play.api.mvc.Action
 import service.{GetInformationForLocationService}
 
-/**
-  * Created by jarema on 6/27/17.
-  */
 object GetInfoForCity {
   def getStationInfo(cityName: String) = Action{
     try {

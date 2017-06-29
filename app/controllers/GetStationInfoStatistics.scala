@@ -4,9 +4,6 @@ import controllers.GetAllController.{InternalServerError, Ok}
 import play.api.mvc.Action
 import service.{GetAllService, GetBasicStationInformation}
 
-/**
-  * Created by jarema on 6/25/17.
-  */
 object GetStationInfoStatistics {
 
   def getStationInfo(id:Int) = Action{

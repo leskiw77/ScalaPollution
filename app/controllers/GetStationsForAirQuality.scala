@@ -4,9 +4,6 @@ import controllers.GetAllController.{InternalServerError, Ok}
 import play.api.mvc.Action
 import service.{GetAllStationsForAirQualityService}
 
-/**
-  * Created by jarema on 6/27/17.
-  */
 object GetStationsForAirQuality {
   def getStationsForAirQuality(id: Int) = Action{
     try {
