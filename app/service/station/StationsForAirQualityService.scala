@@ -1,10 +1,10 @@
-package service
+package service.station
 
 import model.Station
 import play.api.libs.json._
 
 
-object StationsForAirQualityService {
+object  StationsForAirQualityService {
 
   def getStationsIdJsonForAirQuality(airQualityIndex: Int): JsValue = {
     val stations = getStationsForAirQuality(airQualityIndex)
@@ -12,27 +12,21 @@ object StationsForAirQualityService {
     Json.toJson(idList)
   }
 
-  def getStationsForAirQuality(airQuality: Int): Seq[Station] ={
-    val allStations:Seq[Station] = GetAllService.getAll
-    for{
+  def getStationsForAirQuality(airQuality: Int): Seq[Station] = {
+    val allStations: Seq[Station] = GetAllService.getAll
+    for {
       station <- allStations
       if getQualityForStation(station) == airQuality
-    }yield station
+    } yield station
   }
 
   private def get(url: String) = scala.io.Source.fromURL(url).mkString
 
-  private def getQualityForStation(station:Station)={
+  private def getQualityForStation(station: Station) = {
     val url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + station.id
     val content = get(url)
     val json = Json.parse(content)
     (json \ "stIndexLevel" \ "id").as[Int]
-  }
-
-  def main(args: Array[String]): Unit = {
-    val x = StationsForAirQualityService.getStationsIdJsonForAirQuality(1)
-    println(x.getClass)
-    println(x(1).getClass)
   }
 
 }

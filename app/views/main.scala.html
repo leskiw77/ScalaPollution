@@ -12,7 +12,6 @@
                 #map {
                     height: 100%;
                 }
-
                 html, body {
                     height: 100%;
                     margin: 0;
@@ -139,15 +138,25 @@
 
                 function filterByCityName() {
                     var cityname = document.getElementById('cityname').value;
+                    var table = document.getElementById('singleStationInfoTable');
                     if(cityname !== "") {
                         $.get("/getReportForCity/".concat(cityname), function (data, status) {
                             if (status === "success") {
                                 filterPoints(data['stations']);
+                                table.rows[0].cells[1].innerHTML = cityname;
+                                table.rows[3].cells[1].innerHTML = data['indexLevelName'];
+                                var measurements = data['measurements'];
+                                for (var i = 0 ; i < measurements.length ; i++) {
+                                    table.rows[i + 4].cells[0].innerHTML = measurements[i]['key'];
+                                    table.rows[i + 4].cells[1].innerHTML = measurements[i]['lastValue'];
+                                }
                             }
                         });
                         $.get("/getCityLatLng/".concat(cityname), function (data, status) {
                             if (status === "success") {
                                 map.setCenter({lat: data['lat'], lng: data['lng']})
+                                table.rows[1].cells[1].innerHTML = data['lat'];
+                                table.rows[2].cells[1].innerHTML = data['lng'];
                             }
                         });
                     } else {

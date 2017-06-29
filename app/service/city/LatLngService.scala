@@ -1,8 +1,8 @@
-package service
+package service.city
 
 import model.Station
 import play.api.libs.json._
-import service.SingleStationInfoService.getJsonSeqFromMeasurement
+import service.station.GetAllService
 
 object LatLngService {
 
@@ -25,11 +25,12 @@ object LatLngService {
   private def getLatLng(cityName: String): (Double, Double) = {
     val googleAPIResult = get(createUrl(cityName))
     val json = Json.parse(googleAPIResult)
-    val lanlng = (json \\ "location").head
-    ((lanlng \ "lat").as[Double], (lanlng \ "lng").as[Double])
+    val latlng = (json \\ "location").head
+    println("Lat,lng = "+latlng)
+    ((latlng \ "lat").as[Double], (latlng \ "lng").as[Double])
   }
 
-  private def findTheClosestStations(cityName: String): Seq[Station] = {
+  def findTheClosestStations(cityName: String): Seq[Station] = {
     val x0y0 = getLatLng(cityName)
     GetAllService.getAll.map(s =>
       (s, Math.sqrt(Math.pow(s.geogrLat - x0y0._1, 2.0) + Math.pow(s.geogrLng - x0y0._2, 2.0)))).

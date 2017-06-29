@@ -2,7 +2,8 @@ package controllers
 
 import play.api.mvc._
 import play.api.mvc.Action
-import service.{GetAllService, StationsForAirQualityService}
+import service.station.StationsForAirQualityService
+import service.station.{GetAllService, StationsForAirQualityService}
 
 object StationsController extends Controller {
 

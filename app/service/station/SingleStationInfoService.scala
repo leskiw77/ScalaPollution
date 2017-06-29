@@ -1,40 +1,34 @@
-package service
+package service.station
 
 import model.{Measurement, StationMeasurement}
 import play.api.libs.json._
+import service.measurements.MeasurementsService
 
 object SingleStationInfoService {
 
-  def getMeasurementsForStation(stationId: Int): JsValue = {
+  def getStationMeasurementJson (stationId: Int): JsValue = {
+    jsonFromStationMeasurement(getStationMeasurements(stationId))
+  }
+
+  def getStationMeasurements (stationId: Int) : StationMeasurement = {
     val (indexLevelNum, indexLevelName) = getIndexLevelNameForStation(stationId)
     val measurementList = for {
       sensorId <- getSensorsIdListForStation(stationId)
     } yield getLastMeasurementForSensor(sensorId)
-    getJsonFromStationMeasurement(StationMeasurement(stationId, indexLevelName, indexLevelNum, measurementList))
+    println("Measurements from "+stationId+" = "+measurementList)
+    StationMeasurement(stationId, indexLevelName, indexLevelNum, measurementList)
   }
 
-  private def getJsonFromStationMeasurement(station: StationMeasurement) = {
+  private def jsonFromStationMeasurement(stationMeas: StationMeasurement) = {
     JsObject(Seq(
-      "id" -> JsNumber(station.id),
-      "indexLevelNumber" -> JsNumber(station.indexLevelValue),
-      "indexLevelName" -> JsString(station.indexLevelName),
-      "measurements" -> getJsonSeqFromMeasurement(station.measurements)
+      "id" -> JsNumber(stationMeas.id),
+      "indexLevelNumber" -> JsNumber(stationMeas.indexLevelValue),
+      "indexLevelName" -> JsString(stationMeas.indexLevelName),
+      "measurements" -> MeasurementsService.getJsonSeqFromMeasurement(stationMeas.measurements)
     ))
   }
 
   private def get(url: String) = scala.io.Source.fromURL(url).mkString
-
-  private def getJsonSeqFromMeasurement(measurements: Seq[Measurement]) = {
-    Json.toJson(for {
-      measurement <- measurements
-    } yield {
-      JsObject(Seq(
-        "key" -> JsString(measurement.key),
-        "lastValue" -> JsNumber(measurement.lastValue),
-        "dateOfLastMeasurement" -> JsString(measurement.dateOfLastMeasurement)
-      ))
-    })
-  }
 
   private def getSensorsIdListForStation(stationId: Int) = {
     val url = " http://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationId.toString

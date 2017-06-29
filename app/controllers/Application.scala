@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc._
-import service.GetAllService
+import service.station.GetAllService
 
 object Application extends Controller {
 
