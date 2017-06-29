@@ -114,14 +114,6 @@
                     document.getElementById('cityname').value = "";
                 }
 
-                function showStations() {
-                    $.get('/getStationsForQuality/4', function (data, status) {
-                        if (status === "success") {
-                            alert(data)
-                        }
-                    });
-                }
-
                 function filterPoints(idOfPointsToShow) {
                     listOfPoints.forEach(function (e) {
                         e['point'].setMap(null);
