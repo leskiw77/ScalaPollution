@@ -12,8 +12,8 @@ object CityService {
     val report = getCityReport(cityToFind)
     JsObject(Seq(
       "name" -> JsString(report.name),
-      "indexLevelValue" -> JsNumber(report.indexLevelValue),
-      "indexLevelNumber" -> JsString(report.indexLevelName),
+      "indexLevelNumber" -> JsNumber(report.indexLevelValue),
+      "indexLevelName" -> JsString(report.indexLevelName),
       "stations" -> Json.toJson(for {stationId <- report.stations} yield JsNumber(stationId.id)),
       "measurements" -> MeasurementsService.getJsonSeqFromMeasurement(report.averageMeasurements)
     ))
@@ -21,12 +21,12 @@ object CityService {
 
   def getCityReport(cityToFind: String): CityReport = {
     val stations = getStationsForCity(cityToFind)
-    println("Stations in "+cityToFind+" : "+stations)
-    val (measurements,index) = stations match {
+    println("Stations in " + cityToFind + " : " + stations)
+    val (measurements, index) = stations match {
       case Nil => AverageMeasurementsService.getAverageMeasurements(LatLngService.findTheClosestStations(cityToFind))
       case _ => AverageMeasurementsService.getAverageMeasurements(stations)
     }
-    println("Average measurements = "+measurements)
+    println("Average measurements = " + measurements)
     val indexName = index match {
       case 0 => "bardzo dobry"
       case 1 => "dobry"
@@ -35,7 +35,11 @@ object CityService {
       case 4 => "bardzo zły"
       case _ => ""
     }
-    CityReport(cityToFind, indexName, index.toInt, stations, measurements)
+    println("Average index = " + indexName)
+    stations match {
+      case Nil => CityReport(cityToFind, indexName, index.toInt, LatLngService.findTheClosestStations(cityToFind), measurements)
+      case _ => CityReport(cityToFind, indexName, index.toInt, stations, measurements)
+    }
   }
 
   private def get(url: String) = scala.io.Source.fromURL(url).mkString
