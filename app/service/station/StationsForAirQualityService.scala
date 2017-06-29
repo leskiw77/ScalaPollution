@@ -25,6 +25,7 @@ object  StationsForAirQualityService {
     val url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + station.id
     val content = get(url)
     val json = Json.parse(content)
+    println("Checking quality from "+station.stationName)
     (json \ "stIndexLevel" \ "id").as[Int]
   }
 

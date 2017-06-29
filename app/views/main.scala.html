@@ -32,11 +32,6 @@
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
                 <button onclick="filterByCityName()" type="button">Find By City</button><br><br><br>
-                <button onclick="showStations()" type="button">Very Good</button><br>
-                <button onclick="resetMap()" type="button">Good</button><br>
-                <button onclick="resetMap()" type="button">Mild</button><br>
-                <button onclick="resetMap()" type="button">Bad</button><br>
-                <button onclick="resetMap()" type="button">Very Bad</button><br>
                 <button onclick="resetMap()" type="button">RESET</button><br>
             </div>
         </div>
@@ -123,7 +118,7 @@
                 function showStations() {
                     $.get('/getStationsForQuality/4', function (data, status) {
                         if (status === "success") {
-
+                            alert(data)
                         }
                     });
                 }
