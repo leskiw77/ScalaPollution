@@ -28,11 +28,11 @@ object CityService {
     }
     println("Average measurements = " + measurements)
     val indexName = index match {
-      case 0 => "bardzo dobry"
-      case 1 => "dobry"
-      case 2 => "umiarkowany"
-      case 3 => "zły"
-      case 4 => "bardzo zły"
+      case 0 => "Bardzo dobry"
+      case 1 => "Dobry"
+      case 2 => "Umiarkowany"
+      case 3 => "Zły"
+      case 4 => "Bardzo zły"
       case _ => ""
     }
     println("Average index = " + indexName)
