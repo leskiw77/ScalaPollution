@@ -12,6 +12,7 @@
                 #map {
                     height: 100%;
                 }
+
                 html, body {
                     height: 100%;
                     margin: 0;
@@ -21,14 +22,21 @@
     </head>
 
     <body>
-        <div id="columnStationTable" style="float:left; margin:0;width:30%;">
+        <div id="columnStationTable" style="float: left;
+            margin: 0;
+            width: 30%;">
             <div class="col1">
                 <table id="singleStationInfoTable"></table>
             </div>
             <div class="col2">
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
-                <button onclick="filterByCityName()" type="button">Find By City</button><br>
+                <button onclick="filterByCityName()" type="button">Find By City</button><br><br><br>
+                <button onclick="showStations()" type="button">Very Good</button><br>
+                <button onclick="resetMap()" type="button">Good</button><br>
+                <button onclick="resetMap()" type="button">Mild</button><br>
+                <button onclick="resetMap()" type="button">Bad</button><br>
+                <button onclick="resetMap()" type="button">Very Bad</button><br>
                 <button onclick="resetMap()" type="button">RESET</button><br>
             </div>
         </div>
@@ -49,9 +57,9 @@
                 var listOfPoints = [];
                 function initMap() {
                     var table = document.getElementById('singleStationInfoTable');
-                    for(var i = 0 ; i < 12 ; i++) {
+                    for (var i = 0 ; i < 12 ; i++) {
                         table.insertRow(i);
-                        for(var j = 0 ; j < 2 ; j++) {
+                        for (var j = 0 ; j < 2 ; j++) {
                             table.rows[i].insertCell(j);
                         }
                     }
@@ -59,35 +67,17 @@
                     table.rows[1].cells[0].innerHTML = "Lat ";
                     table.rows[2].cells[0].innerHTML = "Lng ";
                     table.rows[3].cells[0].innerHTML = "Pollution level ";
-
                     map = new google.maps.Map(document.getElementById('map'), {
                         center: {lat: 50.068000, lng: 19.912410},
                         zoom: 8
                     });
-
                     map.data.setStyle(function (feature) {
                         return {
                             title: feature.getProperty('name'),
                             optimized: false
                         };
                     });
-
                     setStationPoints();
-                }
-
-                function resetMap() {
-                    listOfPoints.forEach( function (e) { e['point'].setMap(map); });
-                }
-
-                function filterPoints(idOfPointsToShow) {
-                    listOfPoints.forEach( function (e) { e['point'].setMap(null); });
-                    for(i = 0 ; i < idOfPointsToShow.length ; i++) {
-                        for(var j = 0 ; j < listOfPoints.length ; j++) {
-                            if(idOfPointsToShow[i] === listOfPoints[j]['id']) {
-                                listOfPoints[j]['point'].setMap(map);
-                            }
-                        }
-                    }
                 }
 
                 function setStationPoints() {
@@ -109,7 +99,7 @@
                         label: ' ',
                         map: map
                     });
-                    listOfPoints.push( {id:id , point:marker});
+                    listOfPoints.push({id: id, point: marker});
                     marker.addListener('click', function () {
                         setStationInfoTable(id, name, latitude, longitude)
                     });
@@ -117,12 +107,43 @@
 
                 function setStationInfoTable(id, name, lat, lng) {
                     var table = document.getElementById('singleStationInfoTable');
+                    map.setCenter({lat: lat, lng: lng});
+                    map.setZoom(map.zoom + 2);
                     setStationInfoById('/getInfo/'.concat(String(id)), name, lat, lng, table);
+                }
+
+                function resetMap() {
+                    listOfPoints.forEach(function (e) {
+                        e['point'].setMap(map);
+                    });
+                    map.setCenter({lat: 50.068000, lng: 19.912410});
+                    document.getElementById('cityname').value = "";
+                }
+
+                function showStations() {
+                    $.get('/getStationsForQuality/4', function (data, status) {
+                        if (status === "success") {
+
+                        }
+                    });
+                }
+
+                function filterPoints(idOfPointsToShow) {
+                    listOfPoints.forEach(function (e) {
+                        e['point'].setMap(null);
+                    });
+                    for (i = 0 ; i < idOfPointsToShow.length ; i++) {
+                        for (var j = 0 ; j < listOfPoints.length ; j++) {
+                            if (idOfPointsToShow[i] === listOfPoints[j]['id']) {
+                                listOfPoints[j]['point'].setMap(map);
+                            }
+                        }
+                    }
                 }
 
                 function setStationInfoById(url, name, lat, lng, table) {
                     $.get(url, function (data, status) {
-                        if(status === "success") {
+                        if (status === "success") {
                             table.rows[0].cells[1].innerHTML = name;
                             table.rows[1].cells[1].innerHTML = lat;
                             table.rows[2].cells[1].innerHTML = lng;
@@ -139,7 +160,7 @@
                 function filterByCityName() {
                     var cityname = document.getElementById('cityname').value;
                     var table = document.getElementById('singleStationInfoTable');
-                    if(cityname !== "") {
+                    if (cityname !== "") {
                         $.get("/getReportForCity/".concat(cityname), function (data, status) {
                             if (status === "success") {
                                 filterPoints(data['stations']);
@@ -154,7 +175,8 @@
                         });
                         $.get("/getCityLatLng/".concat(cityname), function (data, status) {
                             if (status === "success") {
-                                map.setCenter({lat: data['lat'], lng: data['lng']})
+                                map.setCenter({lat: data['lat'], lng: data['lng']});
+                                map.setZoom(13);
                                 table.rows[1].cells[1].innerHTML = data['lat'];
                                 table.rows[2].cells[1].innerHTML = data['lng'];
                             }
