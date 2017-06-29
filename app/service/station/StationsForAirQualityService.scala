@@ -13,8 +13,9 @@ object  StationsForAirQualityService {
   }
 
   def getStationsForAirQuality(airQuality: Int): Seq[Station] = {
+    val allStations: Seq[Station] = GetAllService.getAll
     for {
-      station <- GetAllService.getAll
+      station <- allStations
       if getQualityForStation(station) == airQuality
     } yield station
   }
@@ -25,7 +26,6 @@ object  StationsForAirQualityService {
     val url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + station.id
     val content = get(url)
     val json = Json.parse(content)
-    println("Checking quality from "+station.stationName)
     (json \ "stIndexLevel" \ "id").as[Int]
   }
 
