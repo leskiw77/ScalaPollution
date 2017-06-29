@@ -1,25 +1,19 @@
 package service
 
-  import model.Station
-  import play.api.libs.json.Json
+import model.Station
+import play.api.libs.json.Json
+import scala.collection.immutable.{List, Seq}
 
-  import scala.collection.immutable.{List, Seq}
-
-/**
-  * Created by jarema on 6/25/17.
-  */
 object GetAllService {
 
-  val url = "http://api.gios.gov.pl/pjp-api/rest/station/findAll"
+  private val url = "http://api.gios.gov.pl/pjp-api/rest/station/findAll"
 
-  def get(url: String) = scala.io.Source.fromURL(url).mkString
+  private def get(url: String): String = scala.io.Source.fromURL(url).mkString
 
   def getAll(): Seq[Station] = {
     var stationList: List[Station] = List()
-
     val content = get(url)
     val json = Json.parse(content)
-
     val max = (json \\ "stationName").length
     for (i <- 0 until max) {
       val elem = json.apply(i)

@@ -8,7 +8,7 @@ import scala.collection.immutable.List
 
 object GetInformationForLocationService {
 
-  def getJsonCityReport(cityToFind:String) = {
+  def getJsonCityReport(cityToFind:String): JsValue = {
 
     val report = getCityReport(cityToFind)
     val json: JsValue = JsObject(Seq(

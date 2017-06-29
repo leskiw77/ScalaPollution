@@ -1,12 +1,12 @@
 package service
 
 import model.Station
-import play.api.libs.json.{JsArray, JsNumber, JsObject, Json}
+import play.api.libs.json._
 
 
 object GetAllStationsForAirQualityService {
 
-  def getStationsIdJsonForAirQuality(airQuality: Int) = {
+  def getStationsIdJsonForAirQuality(airQuality: Int): JsValue = {
     val stations = getStationsForAirQuality(airQuality)
     val idList = for {station <- stations} yield JsNumber(station.id)
     Json.toJson(idList)
@@ -24,7 +24,6 @@ object GetAllStationsForAirQualityService {
 
   private def getQualityForStation(station:Station)={
     val url = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + station.id
-
     val content = get(url)
     val json = Json.parse(content)
     (json \ "stIndexLevel" \ "id").as[Int]

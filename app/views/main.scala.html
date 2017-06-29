@@ -30,12 +30,12 @@
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
                 <button onclick="filterByCityName()" type="button">Find By City</button><br>
-                    <button onclick="filterByCityName()" type="button">Very good</button><br>
-                    <button type="button">Good</button><br>
-                    <button type="button">Middle</button><br>
-                    <button type="button">Bad</button><br>
-                    <button type="button">Very Bad</button><br>
-                    <button onclick="resetMap()" type="button">RESET</button><br>
+                <button onclick="filterByAirCondition()" type="button">Very Good</button><br>
+                <button onclick="filterByAirCondition()" type="button">Good</button><br>
+                <button onclick="filterByAirCondition()" type="button">Mild</button><br>
+                <button onclick="filterByAirCondition()" type="button">Bad</button><br>
+                <button onclick="filterByAirCondition()" type="button">Very Bad</button><br><br>
+                <button onclick="resetMap()" type="button">RESET</button><br>
             </div>
         </div>
         <div id="map"></div>
@@ -82,9 +82,18 @@
                 }
 
                 function resetMap() {
-                    listOfPoints.forEach( function (e) {
-                        e['point'].setMap(map);
-                    })
+                    listOfPoints.forEach( function (e) { e['point'].setMap(map); });
+                }
+
+                function filterPoints(idOfPointsToShow) {
+                    listOfPoints.forEach( function (e) { e['point'].setMap(null); });
+                    for(i = 0 ; i < idOfPointsToShow.length ; i++) {
+                        for(var j = 0 ; j < listOfPoints.length ; j++) {
+                            if(idOfPointsToShow[i] === listOfPoints[j]['id']) {
+                                listOfPoints[j]['point'].setMap(map);
+                            }
+                        }
+                    }
                 }
 
                 function setStationPoints() {
@@ -114,49 +123,45 @@
 
                 function setStationInfoTable(id, name, lat, lng) {
                     var table = document.getElementById('singleStationInfoTable');
-                    var url = '/getInfo/'.concat(String(id));
-                    setStationInfoById(url, name, lat, lng, table);
+                    setStationInfoById('/getInfo/'.concat(String(id)), name, lat, lng, table);
                 }
 
                 function setStationInfoById(url, name, lat, lng, table) {
-                    var resultHttp = new XMLHttpRequest();
-                    resultHttp.open("GET", url, false);
-                    resultHttp.send(null);
-
-                    table.rows[0].cells[1].innerHTML = name;
-                    table.rows[1].cells[1].innerHTML = lat;
-                    table.rows[2].cells[1].innerHTML = lng;
-                    var json = JSON.parse(resultHttp.responseText);
-                    table.rows[3].cells[1].innerHTML = json['indexLevelName'];
-                    var measurements = json['measurements'];
-                    for(var i = 0 ; i < measurements.length ; i++) {
-                        table.rows[i+4].cells[0].innerHTML = measurements[i]['key'];
-                        table.rows[i+4].cells[1].innerHTML = measurements[i]['lastValue'];
-                    }
+                    $.get(url, function (data, status) {
+                        if(status === "success") {
+                            table.rows[0].cells[1].innerHTML = name;
+                            table.rows[1].cells[1].innerHTML = lat;
+                            table.rows[2].cells[1].innerHTML = lng;
+                            table.rows[3].cells[1].innerHTML = data['indexLevelName'];
+                            var measurements = data['measurements'];
+                            for (var i = 0 ; i < measurements.length ; i++) {
+                                table.rows[i + 4].cells[0].innerHTML = measurements[i]['key'];
+                                table.rows[i + 4].cells[1].innerHTML = measurements[i]['lastValue'];
+                            }
+                        }
+                    });
                 }
 
                 function filterByCityName() {
-                    var cityname = document.getElementById('cityname').value
+                    var cityname = document.getElementById('cityname').value;
                     if(cityname !== "") {
-                        var resultHttp = new XMLHttpRequest();
-                        resultHttp.open("GET", "/getReportForCity/".concat(cityname), false);
-                        resultHttp.send(null);
-                        var stations = JSON.parse(resultHttp.responseText)['stations'];
-                        for(var i = 0 ; i < listOfPoints.length ; i++) {
-                            listOfPoints[i]['point'].setMap(null);
-                        }
-                        for(i = 0 ; i < stations.length ; i++) {
-                            for(var j = 0 ; j < listOfPoints.length ; j++) {
-                                if(stations[i] === listOfPoints[j]['id']) {
-                                    listOfPoints[j]['point'].setMap(map);
-                                }
+                        $.get("/getReportForCity/".concat(cityname), function (data, status) {
+                            if (status === "success") {
+                                filterPoints(data['stations']);
                             }
-                        }
+                        });
                     } else {
                         alert("Empty cityname!");
                     }
                 }
-        </script>
 
+                function filterByAirCondition() {
+                    var resultHttp = new XMLHttpRequest();
+                    resultHttp.open("GET", "/getStationsForQuality/4", false);
+                    resultHttp.send(null);
+                    alert(resultHttp.responseText);
+                }
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     </body>
 </html>
