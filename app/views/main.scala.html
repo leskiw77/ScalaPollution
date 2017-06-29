@@ -30,11 +30,6 @@
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
                 <button onclick="filterByCityName()" type="button">Find By City</button><br>
-                <button onclick="filterByAirCondition()" type="button">Very Good</button><br>
-                <button onclick="filterByAirCondition()" type="button">Good</button><br>
-                <button onclick="filterByAirCondition()" type="button">Mild</button><br>
-                <button onclick="filterByAirCondition()" type="button">Bad</button><br>
-                <button onclick="filterByAirCondition()" type="button">Very Bad</button><br><br>
                 <button onclick="resetMap()" type="button">RESET</button><br>
             </div>
         </div>
@@ -150,16 +145,14 @@
                                 filterPoints(data['stations']);
                             }
                         });
+                        $.get("/getCityLatLng/".concat(cityname), function (data, status) {
+                            if (status === "success") {
+                                map.setCenter({lat: data['lat'], lng: data['lng']})
+                            }
+                        });
                     } else {
                         alert("Empty cityname!");
                     }
-                }
-
-                function filterByAirCondition() {
-                    var resultHttp = new XMLHttpRequest();
-                    resultHttp.open("GET", "/getStationsForQuality/4", false);
-                    resultHttp.send(null);
-                    alert(resultHttp.responseText);
                 }
         </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

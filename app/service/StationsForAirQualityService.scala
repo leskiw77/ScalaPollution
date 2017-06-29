@@ -4,16 +4,16 @@ import model.Station
 import play.api.libs.json._
 
 
-object GetAllStationsForAirQualityService {
+object StationsForAirQualityService {
 
-  def getStationsIdJsonForAirQuality(airQuality: Int): JsValue = {
-    val stations = getStationsForAirQuality(airQuality)
+  def getStationsIdJsonForAirQuality(airQualityIndex: Int): JsValue = {
+    val stations = getStationsForAirQuality(airQualityIndex)
     val idList = for {station <- stations} yield JsNumber(station.id)
     Json.toJson(idList)
   }
 
   def getStationsForAirQuality(airQuality: Int): Seq[Station] ={
-    val allStations:Seq[Station] = GetAllService.getAll()
+    val allStations:Seq[Station] = GetAllService.getAll
     for{
       station <- allStations
       if getQualityForStation(station) == airQuality
@@ -30,7 +30,7 @@ object GetAllStationsForAirQualityService {
   }
 
   def main(args: Array[String]): Unit = {
-    val x = GetAllStationsForAirQualityService.getStationsIdJsonForAirQuality(1)
+    val x = StationsForAirQualityService.getStationsIdJsonForAirQuality(1)
     println(x.getClass)
     println(x(1).getClass)
   }

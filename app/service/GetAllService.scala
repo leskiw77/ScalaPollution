@@ -10,7 +10,7 @@ object GetAllService {
 
   private def get(url: String): String = scala.io.Source.fromURL(url).mkString
 
-  def getAll(): Seq[Station] = {
+  def getAll: Seq[Station] = {
     var stationList: List[Station] = List()
     val content = get(url)
     val json = Json.parse(content)

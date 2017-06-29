@@ -6,7 +6,7 @@ import service.GetAllService
 object Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Hello", GetAllService.getAll()))
+    Ok(views.html.index("Hello", GetAllService.getAll))
   }
 
 }

@@ -3,20 +3,31 @@ package service
 import model.{Measurement, StationMeasurement}
 import play.api.libs.json._
 
-object GetBasicStationInformation {
+object SingleStationInfoService {
 
-  def getMeasurementsForStation(stationId:Int) = {
+  def getMeasurementsForStation(stationId: Int): JsValue = {
     val (indexLevelNum, indexLevelName) = getIndexLevelNameForStation(stationId)
-    val measumentList = for {
+    val measurementList = for {
       sensorId <- getSensorsIdListForStation(stationId)
-    }yield getLastMeasurementForSensor(sensorId)
-    getJsonFromStationMeasurement(StationMeasurement(stationId,indexLevelName, indexLevelNum, measumentList))
+    } yield getLastMeasurementForSensor(sensorId)
+    getJsonFromStationMeasurement(StationMeasurement(stationId, indexLevelName, indexLevelNum, measurementList))
   }
 
+  private def getJsonFromStationMeasurement(station: StationMeasurement) = {
+    JsObject(Seq(
+      "id" -> JsNumber(station.id),
+      "indexLevelNumber" -> JsNumber(station.indexLevelValue),
+      "indexLevelName" -> JsString(station.indexLevelName),
+      "measurements" -> getJsonSeqFromMeasurement(station.measurements)
+    ))
+  }
+
+  private def get(url: String) = scala.io.Source.fromURL(url).mkString
+
   private def getJsonSeqFromMeasurement(measurements: Seq[Measurement]) = {
-    Json.toJson(for{
+    Json.toJson(for {
       measurement <- measurements
-    }yield{
+    } yield {
       JsObject(Seq(
         "key" -> JsString(measurement.key),
         "lastValue" -> JsNumber(measurement.lastValue),
@@ -25,26 +36,13 @@ object GetBasicStationInformation {
     })
   }
 
-  private def getJsonFromStationMeasurement(station : StationMeasurement) = {
-    val json: JsValue = JsObject(Seq(
-      "id" -> JsNumber(station.id),
-      "indexLevelNumber" -> JsNumber(station.indexLevelValue),
-      "indexLevelName" -> JsString(station.indexLevelName),
-      "measurements" -> getJsonSeqFromMeasurement(station.measurements)
-    ))
-    json
-  }
-
-
-  private def get(url: String) = scala.io.Source.fromURL(url).mkString
-
   private def getSensorsIdListForStation(stationId: Int) = {
     val url = " http://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationId.toString
     val content = get(url)
     val json = Json.parse(content)
     for {
       e <- json \\ "id"
-    }yield e.as[Int]
+    } yield e.as[Int]
   }
 
   private def getIndexLevelNameForStation(stationId: Int) = {
@@ -66,7 +64,6 @@ object GetBasicStationInformation {
 
     var i = 0
     while (true) {
-
       val elem = values.apply(i)
       try {
         val lastValue = (elem \ "value").as[Double]
@@ -74,18 +71,14 @@ object GetBasicStationInformation {
         return Measurement(key, lastValue, lastDate)
       }
       catch {
-        case _:JsResultException =>
+        case _: JsResultException =>
       }
       i += 1
-      if(i>= max){
-        return Measurement(key,0,"No measurements detected for this sensor")
+      if (i >= max) {
+        return Measurement(key, 0, "No measurements detected for this sensor")
       }
     }
-
     throw new IllegalStateException("No measurements for sensor")
   }
 
-  def main(args: Array[String]): Unit = {
-    println(Json.toJson(getMeasurementsForStation(14).toString))
-  }
 }
