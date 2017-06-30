@@ -12,21 +12,31 @@
                 #map {
                     height: 100%;
                 }
+
                 html, body {
                     height: 100%;
                     margin: 0;
                     padding: 0;
+                }
+
+                #singleStationInfoTable {
+                    border: 2px solid black;
+                    text-align: center;
+                    color: #000000;
+                    border-radius:6px;
+                    empty-cells: hide;
                 }
         </style>
     </head>
 
     <body>
         <div id="columnStationTable" style="float: left;
-            margin: 0;
+            margin-left: auto;
             width: 30%;">
             <div class="col1">
                 <table id="singleStationInfoTable"></table>
             </div>
+            <br><br>
             <div class="col2">
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
@@ -102,7 +112,11 @@
                 function setStationInfoTable(id, name, lat, lng) {
                     var table = document.getElementById('singleStationInfoTable');
                     map.setCenter({lat: lat, lng: lng});
-                    map.setZoom(map.zoom + 2);
+                    map.setZoom(map.zoom + 1);
+                    table.style.backgroundColor = "#FFFFFF";
+                    table.rows[0].cells[1].innerHTML = "...";
+                    table.rows[1].cells[1].innerHTML = "...";
+                    table.rows[2].cells[1].innerHTML = "...";
                     setStationInfoById('/getInfo/'.concat(String(id)), name, lat, lng, table);
                 }
 
@@ -127,6 +141,17 @@
                     }
                 }
 
+                function colorByPollution(pollutionIndexLevel) {
+                    switch (pollutionIndexLevel) {
+                        case 0 : return "#03d708";
+                        case 1 : return "#95ff06";
+                        case 2 : return "#f9ff00";
+                        case 3 : return "#ff8d00";
+                        case 4 : return "#ff0400";
+                        return "#ffffff"
+                    }
+                }
+
                 function setStationInfoById(url, name, lat, lng, table) {
                     $.get(url, function (data, status) {
                         if (status === "success") {
@@ -139,13 +164,18 @@
                                 table.rows[i + 4].cells[0].innerHTML = measurements[i]['key'];
                                 table.rows[i + 4].cells[1].innerHTML = measurements[i]['lastValue'];
                             }
+                            table.style.backgroundColor = colorByPollution(data['indexLevelNumber']);
                         }
                     });
                 }
 
                 function filterByCityName() {
-                    var cityname = document.getElementById('cityname').value;
                     var table = document.getElementById('singleStationInfoTable');
+                    table.style.backgroundColor = "#FFFFFF";
+                    table.rows[0].cells[1].innerHTML = "...";
+                    table.rows[1].cells[1].innerHTML = "...";
+                    table.rows[2].cells[1].innerHTML = "...";
+                    var cityname = document.getElementById('cityname').value;
                     if (cityname !== "") {
                         $.get("/getReportForCity/".concat(cityname), function (data, status) {
                             if (status === "success") {
@@ -157,6 +187,7 @@
                                     table.rows[i + 4].cells[0].innerHTML = measurements[i]['key'];
                                     table.rows[i + 4].cells[1].innerHTML = measurements[i]['lastValue'];
                                 }
+                                table.style.backgroundColor = colorByPollution(data['indexLevelNumber']);
                             }
                         });
                         $.get("/getCityLatLng/".concat(cityname), function (data, status) {
