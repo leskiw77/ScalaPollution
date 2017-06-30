@@ -1,11 +1,12 @@
 package controllers
 
-import play.api.mvc._
-import play.api.mvc.Action
-import service.station.StationsForAirQualityService
+import javax.inject.Inject
+
+import play.api.mvc.{Action, _}
 import service.station.{GetAllService, StationsForAirQualityService}
 
-object StationsController extends Controller {
+
+class StationsController @Inject()(stationService: StationsForAirQualityService) extends Controller {
 
   def getAll = Action {
     try {
@@ -18,7 +19,7 @@ object StationsController extends Controller {
 
   def getStationsByAirQuality(airQualityIndex: Int) = Action {
     try {
-      Ok(StationsForAirQualityService.getStationsIdJsonForAirQuality(airQualityIndex))
+      Ok(stationService.getStationsIdJsonForAirQuality(airQualityIndex))
     } catch {
       case ioe: java.io.IOException => InternalServerError(ioe.toString)
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)

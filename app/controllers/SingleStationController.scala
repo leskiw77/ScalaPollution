@@ -1,14 +1,16 @@
 package controllers
 
-import play.api.mvc._
-import play.api.mvc.Action
+import javax.inject.Inject
+
+import play.api.mvc.{Action, _}
 import service.station.SingleStationInfoService
 
-object SingleStationController extends Controller {
+
+class SingleStationController @Inject()(stationService: SingleStationInfoService) extends Controller {
 
   def getStationInfo(id: Int) = Action {
     try {
-      Ok(SingleStationInfoService.getStationMeasurementJson(id))
+      Ok(stationService.getStationMeasurementJson(id))
     } catch {
       case ioe: java.io.IOException => InternalServerError(ioe.toString)
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)

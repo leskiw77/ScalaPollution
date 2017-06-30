@@ -5,6 +5,7 @@ import play.api.libs.json._
 
 import scala.collection.immutable.{List, Seq}
 
+
 object GetAllService {
 
   private val url = "http://api.gios.gov.pl/pjp-api/rest/station/findAll"

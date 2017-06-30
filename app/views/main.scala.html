@@ -23,7 +23,7 @@
                     border: 2px solid black;
                     text-align: center;
                     color: #000000;
-                    border-radius:6px;
+                    border-radius: 6px;
                     empty-cells: hide;
                 }
         </style>
@@ -31,17 +31,22 @@
 
     <body>
         <div id="columnStationTable" style="float: left;
-            margin-left: auto;
+            margin-left: 10px;
             width: 30%;">
             <div class="col1">
                 <table id="singleStationInfoTable"></table>
             </div>
-            <br><br>
+            <br>
+            <br>
             <div class="col2">
                 Find City : <br>
                 <input type="text" id="cityname" title="Find city">
-                <button onclick="filterByCityName()" type="button">Find By City</button><br><br><br>
-                <button onclick="resetMap()" type="button">RESET</button><br>
+                <button onclick="filterByCityName()" type="button">Find By City</button>
+                <br>
+                <br>
+                <br>
+                <button onclick="resetMap()" type="button">RESET</button>
+                <br>
             </div>
         </div>
         <div id="map"></div>
@@ -112,7 +117,6 @@
                 function setStationInfoTable(id, name, lat, lng) {
                     var table = document.getElementById('singleStationInfoTable');
                     map.setCenter({lat: lat, lng: lng});
-                    map.setZoom(map.zoom + 1);
                     table.style.backgroundColor = "#FFFFFF";
                     table.rows[0].cells[1].innerHTML = "...";
                     table.rows[1].cells[1].innerHTML = "...";
@@ -125,6 +129,7 @@
                         e['point'].setMap(map);
                     });
                     map.setCenter({lat: 50.068000, lng: 19.912410});
+                    map.setZoom(8)
                     document.getElementById('cityname').value = "";
                 }
 
@@ -143,12 +148,17 @@
 
                 function colorByPollution(pollutionIndexLevel) {
                     switch (pollutionIndexLevel) {
-                        case 0 : return "#03d708";
-                        case 1 : return "#95ff06";
-                        case 2 : return "#f9ff00";
-                        case 3 : return "#ff8d00";
-                        case 4 : return "#ff0400";
-                        return "#ffffff"
+                        case 0 :
+                            return "#03d708";
+                        case 1 :
+                            return "#95ff06";
+                        case 2 :
+                            return "#f9ff00";
+                        case 3 :
+                            return "#ff8d00";
+                        case 4 :
+                            return "#ff0400";
+                            return "#ffffff"
                     }
                 }
 
@@ -193,7 +203,6 @@
                         $.get("/getCityLatLng/".concat(cityname), function (data, status) {
                             if (status === "success") {
                                 map.setCenter({lat: data['lat'], lng: data['lng']});
-                                map.setZoom(13);
                                 table.rows[1].cells[1].innerHTML = data['lat'];
                                 table.rows[2].cells[1].innerHTML = data['lng'];
                             }

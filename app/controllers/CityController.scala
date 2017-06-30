@@ -1,15 +1,16 @@
 package controllers
 
-import play.api.mvc._
-import play.api.mvc.Action
-import service.city.LatLngService
+import javax.inject.Inject
+
+import play.api.mvc.{Action, _}
 import service.city.{CityService, LatLngService}
 
-object CityController extends Controller {
+
+class CityController @Inject()(cityService: CityService, latLngService: LatLngService) extends Controller {
 
   def getCityAverageMeasurements(cityName: String) = Action {
     try {
-      Ok(CityService.getJsonCityReport(cityName))
+      Ok(cityService.getJsonCityReport(cityName))
     } catch {
       case ioe: java.io.IOException => InternalServerError(ioe.toString)
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)
@@ -18,7 +19,7 @@ object CityController extends Controller {
 
   def getCityInfo(cityName: String) = Action {
     try {
-      Ok(CityService.getJsonCityReport(cityName))
+      Ok(cityService.getJsonCityReport(cityName))
     } catch {
       case ioe: java.io.IOException => InternalServerError(ioe.toString)
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)
@@ -27,7 +28,7 @@ object CityController extends Controller {
 
   def getCityLanLng(cityName: String) = Action {
     try {
-      Ok(LatLngService.getLatLngJson(cityName))
+      Ok(latLngService.getLatLngJson(cityName))
     } catch {
       case ioe: java.io.IOException => InternalServerError(ioe.toString)
       case ste: java.net.SocketTimeoutException => InternalServerError(ste.toString)
